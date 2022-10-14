@@ -36,7 +36,8 @@ const { generarJWT } = require('../helpers/jwt');
          ok: true,
          uid: dbUsuario.id,
          name,
-         token
+         token,
+         email
       });
 
    } catch (error) {
@@ -81,7 +82,8 @@ const loginUsuario = async(req, res) => {
          ok: true,
          uid: dbUsuario.id,
          name: dbUsuario.name,
-         token
+         token,
+         email: dbUsuario.email
       })
       
    } catch (error) {
@@ -97,16 +99,19 @@ const loginUsuario = async(req, res) => {
 // ---------- Renovar token
 
 const revalidarToken = async(req, res) => {
-   const { uid, name } = req;
-   const dbUsuario = new Usuario(req.body);
+   const { uid } = req;
+   // Leer la BBDD
+   const dbUser = await Usuario.findById(uid);
+
    // Generar el JWT
-   const token = await generarJWT(dbUsuario.id, name);
+   const token = await generarJWT(uid, dbUser.name);
    
 
    return res.json({
       ok: true,
       uid,
-      name,
+      name: dbUser.name,
+      email: dbUser.email,
       token
    });
 }
